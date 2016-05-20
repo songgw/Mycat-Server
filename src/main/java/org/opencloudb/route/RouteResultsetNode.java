@@ -53,6 +53,8 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 	// 强制走 master，可以通过 RouteResultset的属性canRunInReadDB(false)
 	// 传给 RouteResultsetNode 来实现，但是 强制走 slave需要增加一个属性来实现:
 	private Boolean runOnSlave = null;	// 默认null表示不施加影响, true走slave,false走master
+	
+	private Boolean isForce = null;	// 默认null表示不施加影响, true强制走slave,false走master
 
 	public RouteResultsetNode(String name, int sqlType, String srcStatement) {
 		this.name = name;
@@ -77,7 +79,15 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
         this.hintMap = hintMap;
     }
     
-    public Boolean getRunOnSlave() {
+    public Boolean getIsForce() {
+		return isForce;
+	}
+
+	public void setIsForce(Boolean isForce) {
+		this.isForce = isForce;
+	}
+
+	public Boolean getRunOnSlave() {
 		return runOnSlave;
 	}
 
@@ -100,10 +110,16 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 	public void resetStatement() {
 		this.statement = srcStatement;
 	}
-
+    
+	/**
+	 * 场景与华夏业务不匹配，抛弃blance注解功能
+	 * @param autocommit
+	 * @return
+	 */
 	public boolean canRunnINReadDB(boolean autocommit) {
-		return canRunInReadDB && autocommit && !hasBlanceFlag
-			|| canRunInReadDB && !autocommit && hasBlanceFlag;
+		/*return canRunInReadDB && autocommit && !hasBlanceFlag
+				|| canRunInReadDB && !autocommit && hasBlanceFlag;*/
+		return canRunInReadDB && autocommit ;
 	}
 
     public Procedure getProcedure()
